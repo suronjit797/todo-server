@@ -1,3 +1,5 @@
+require('dotenv').config()
+const { MongoClient, ServerApiVersion } = require('mongodb');
 const express = require('express');
 const cors = require('cors');
 
@@ -9,12 +11,42 @@ app.use(cors())
 
 
 
+const uri = process.env.DB_URL;
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
+
+// collection
+const todoCollection = client.db("test").collection("devices");
+
+async function run() {
+    await client.connect();
+    console.log('database connected...');
+
+    // get todo
 
 
-app.get('/', (req, res)=>{
-    res.send({message: 'tod server'})
+    // post todo
+    app.post('/todo', async (req, res)=>{
+        const todo = req.body
+        console.log(todo);
+        const result = await todoCollection.insertOne(todo)
+        res.send(result)
+    })
+    
+
+
+
+
+
+}
+
+run().catch(console.dir)
+
+
+
+app.get('/', (req, res) => {
+    res.send({ message: 'tod server' })
 })
 
-app.listen(port, ()=>{
+app.listen(port, () => {
     console.log(`server is online on port ${port}...`);
 })
