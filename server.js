@@ -33,6 +33,7 @@ async function run() {
         const result = await todoCollection.insertOne(todo)
         res.send(result)
     })
+
     // update todo
     app.put('/todo/:id', async (req, res) => {
         const { id } = req.params
@@ -42,6 +43,14 @@ async function run() {
             $set: { complete }
         }
         const result = await todoCollection.updateOne(filter, update, { upsert: true })
+        res.send(result)
+    })
+
+    // remove todo
+    app.delete('/todo/:id', async (req, res) => {
+        const { id } = req.params
+        const filter = { _id: ObjectId(id) }
+        const result = await todoCollection.deleteOne(filter)
         res.send(result)
     })
 
