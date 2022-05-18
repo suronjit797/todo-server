@@ -1,5 +1,5 @@
 require('dotenv').config()
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express');
 const cors = require('cors');
 
@@ -22,18 +22,29 @@ async function run() {
     console.log('database connected...');
 
     // get todo
-    app.get('/todo', async (req, res)=>{
+    app.get('/todo', async (req, res) => {
         const result = await todoCollection.find().toArray()
         res.send(result)
     })
 
     // post todo
-    app.post('/todo', async (req, res)=>{
+    app.post('/todo', async (req, res) => {
         const todo = req.body
         const result = await todoCollection.insertOne(todo)
         res.send(result)
     })
-    
+    // update todo
+    app.put('/todo/:id', async (req, res) => {
+        const { id } = req.params
+        const complete = req.body.complete
+        const filter = { _id: ObjectId(id) }
+        const update = {
+            $set: { complete }
+        }
+        const result = await todoCollection.updateOne(filter, update, { upsert: true })
+        res.send(result)
+    })
+
 
 
 
